@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/style.css" rel="stylesheet">
+    <title>Smart IoT Aquarium System</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .btn {
+            font-size: 1.5em;
+            margin: 0.5em;
+            padding: 0.5em 1em;
+            cursor: pointer;
+        }
+        .feed-section {
+            margin: 2em auto;
+            border: 2px solid white;
+            padding: 1em;
+            width: 300px;
+        }
+        .feed-count {
+            font-size: 2em;
+            margin: 0.5em 0;
+        }
+        .time-select {
+            font-size: 1.5em;
+        }
+        .save-button {
+            display: block;
+            margin: 2em auto;
+            padding: 0.5em 1em;
+            font-size: 1.2em;
+        }
+        .main-button {
+            display: block;
+            margin: 2em auto;
+            padding: 0.5em 1em;
+            font-size: 1.2em;
+        }
+        .result {
+            margin-top: 1em;
+            font-size: 1.2em;
+            color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Smart IoT Aquarium System</h1>
+    </header>
+
+    <div class="feed-section">
+        <h2>FEED</h2>
+        <button class="btn" onclick="increaseFeed()" style="background-color: lightblue;">+</button>
+        <span id="feed-count" class="feed-count">1회</span>
+        <button class="btn" onclick="decreaseFeed()" style="background-color: lightcoral;">-</button>
+        <div>
+            <span class="time-select">
+                <select id="hour-select">
+                    <script>
+                        for (let i = 0; i < 24; i++) {
+                            document.write(`<option value="${i}">${i}</option>`);
+                        }
+                    </script>
+                </select>
+                :
+                <select id="minute-select">
+                    <script>
+                        for (let i = 0; i < 60; i++) {
+                            document.write(`<option value="${i}">${i < 10 ? "0" + i : i}</option>`);
+                        }
+                    </script>
+                </select>
+            </span>
+        </div>
+    </div>
+
+    <button class="btn save-button" onclick="saveSetting()">저장</button>
+    <a href="/main" class="btn main-button">메인 화면</a>
+    
+    <div id="result" class="result"></div> <!-- 결과를 표시할 영역 -->
+
+    <script>
+        window.onload = function () {
+            const savedFeedCount = localStorage.getItem("feedCount");
+            const savedHour = localStorage.getItem("hour");
+            const savedMinute = localStorage.getItem("minute");
+            if (savedFeedCount !== null && savedHour !== null && savedMinute !== null) {
+                document.getElementById("feed-count").textContent = `${savedFeedCount}회`;
+                document.getElementById("hour-select").value = savedHour;
+                document.getElementById("minute-select").value = savedMinute;
+            }
+        };
+
+        function increaseFeed() {
+            const feedCountElement = document.getElementById("feed-count");
+            let currentValue = parseInt(feedCountElement.textContent, 10);
+            feedCountElement.textContent = `${++currentValue}회`;
+        }
+
+        function decreaseFeed() {
+            const feedCountElement = document.getElementById("feed-count");
+            let currentValue = parseInt(feedCountElement.textContent, 10);
+            if (currentValue > 0) {
+                feedCountElement.textContent = `${--currentValue}회`;
+            }
+        }
+
+        function feedList() {
+            const feedCount = document.getElementById("feed-count").textContent.replace('회', '');
+            const hour = document.getElementById("hour-select").value;
+            const minute = document.getElementById("minute-select").value;
+            localStorage.setItem("feedCount", feedCount);
+            localStorage.setItem("hour", hour);
+            localStorage.setItem("minute", minute);
+        }
+
+        function saveSetting() {
+            const feedCount = document.getElementById("feed-count").textContent.replace('회', '');
+            let hour = document.getElementById("hour-select").value;
+            let minute = document.getElementById("minute-select").value;
+
+            hour = hour < 10 ? "0" + hour : hour;
+            minute = minute < 10 ? "0" + minute : minute;
+
+            fetch("/feed", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    feedCount,
+                    hour,
+                    minute,
+                }),
+            })
+            .then((response) => response.text())
+            .then((data) => {
+                console.log(data);
+                alert("전송 완료");
+                feedList();
+                displayResult(feedCount, hour, minute); // 전송된 횟수와 시간을 표시
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("전송 실패");
+            });
+        }
+
+        function displayResult(feedCount, hour, minute) {
+            const resultElement = document.getElementById("result");
+            resultElement.textContent = `전송된 횟수: ${feedCount}회, 시간: ${hour}시 ${minute}분`;
+        }
+    </script>
+</body>
+</html>

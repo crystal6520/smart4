@@ -1,0 +1,65 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0; /* 배경색 설정 */
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #333; /* 헤더 배경색 */
+  color: #fff; /* 헤더 텍스트 색상 */
+  padding: 1rem;
+  text-align: center; /* 중앙 정렬 */
+}
+
+.settings-section {
+  margin: 2rem; /* 외부 여백 */
+  padding: 1rem; /* 내부 여백 */
+  background-color: #fff; /* 배경색 */
+  border-radius: 8px; /* 모서리 둥글게 */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+}
+
+h1, h2 {
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse; /* 테이블 선 겹침 방지 */
+  margin-top: 1rem;
+}
+
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+  border: 1px solid #ddd; /* 셀 테두리 */
+}
+
+th {
+  background-color: #333; /* 테이블 헤더 배경색 */
+  color: white; /* 테이블 헤더 텍스트 색상 */
+}
+
+td {
+  background-color: #fff; /* 테이블 데이터 배경색 */
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  margin-top: 2rem;
+  background-color: #333; /* 버튼 배경색 */
+  color: #fff; /* 버튼 텍스트 색상 */
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #555; /* 버튼 호버 효과 */
+}

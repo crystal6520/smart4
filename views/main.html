@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart IoT Aquarium System</title>
+    <style>
+      body {
+        background-color: #000;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      header {
+        width: 100%;
+        text-align: center;
+        background-color: #282828;
+        padding: 20px 0;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 36px;
+      }
+
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        width: 80%;
+      }
+
+      .item {
+        background-color: #444;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        flex: 1 1 45%;
+        text-align: center;
+        margin: 10px;
+      }
+
+      .item a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 20px;
+        display: block;
+        margin: 10px 0;
+      }
+
+      .item h2 {
+        font-size: 28px;
+        margin-bottom: 10px;
+      }
+
+      .item p {
+        font-size: 20px;
+      }
+
+      .full-width {
+        flex: 1 1 100%;
+      }
+
+      .live-cam {
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      #liveStream {
+        width: 660px;
+        height: 500px;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        margin-top: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          width: 100%;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .item {
+          flex: 1 1 100%;
+        }
+
+        #liveStream {
+          width: 100%;
+          height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Smart IoT Aquarium System</h1>
+    </header>
+
+    <div class="container">
+      <div class="item">
+        <a href="/ph">pH 농도 기록 차트</a>
+      </div>
+      <div class="item">
+        <h2>Live AquaSensor</h2>
+        <p>
+          온도: <span id="temperature">N/A</span> C &nbsp;&nbsp; pH 농도:
+          <span id="ph">N/A</span>
+        </p>
+      </div>
+      <div class="item">
+        <a href="/temp">온도 기록 차트</a>
+      </div>
+      <div class="item">
+        <a href="/feed">먹이 공급 시간 설정</a>
+      </div>
+      <div class="item full-width">
+        <a href="/water">물 공급 횟수 및 기록 차트</a>
+      </div>
+    </div>
+    <div class="live-cam item">
+      <iframe
+        id="liveStream"
+        src="https://172.17.236.250:8080/stream"
+      ></iframe>
+    </div>
+
+    <script>
+      // 서버로부터 실시간 온도 데이터를 가져와서 표시하는 함수
+      function fetchTemperature() {
+        fetch("/temperature")
+          .then((response) => response.json())
+          .then((data) => {
+            // 서버에서 받은 가장 최신 온도 값을 표시
+            const latestTemperature = data[0].temp;
+            document.getElementById("temperature").textContent =
+              latestTemperature;
+          })
+          .catch((error) => {
+            console.error("온도 데이터를 가져오는 중 오류 발생:", error);
+          });
+      }
+
+      // 서버로부터 실시간 pH 데이터를 가져와서 표시하는 함수
+      function fetchPH() {
+        fetch("/phsensor")
+          .then((response) => response.json())
+          .then((data) => {
+            // 서버에서 받은 가장 최신 pH 값을 표시
+            const latestPH = data[0].ph;
+            document.getElementById("ph").textContent = latestPH;
+          })
+          .catch((error) => {
+            console.error("pH 데이터를 가져오는 중 오류 발생:", error);
+          });
+      }
+
+      // 페이지 로드 시 초기 온도와 pH 값을 가져와서 표시
+      window.onload = function () {
+        fetchTemperature();
+        fetchPH();
+        // 주기적으로 온도와 pH 값을 업데이트
+        setInterval(fetchTemperature, 5000); // 5초마다 업데이트
+        setInterval(fetchPH, 5000); // 5초마다 업데이트
+      };
+    </script>
+  </body>
+</html>
